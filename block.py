@@ -3,7 +3,7 @@ from cryptography.hazmat.primitives import hashes
 
 
 ## this uses Proof of work method
-## but I don*t really like POW method
+## but I don't really like POW method
 
 class Block:
 	def __init__(self, header, nonce, pv_hash):
