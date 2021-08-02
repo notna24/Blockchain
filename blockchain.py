@@ -5,9 +5,11 @@ class Blockchain:
     def __init__(self):
         self.blocks = []
         self.difficulty = 0
-
     
-    def add_block(self):
+    def add_block(self, block):
+        pass
+
+    def load_from_json(self, file):
         pass
 
     def get_json(self):
@@ -24,7 +26,7 @@ class MemPool:
 
     def rm_transaction(self, transaction):
         if transaction in self.transactions:
-            return self.transactions.remvoe(transaction)
+            return self.transactions.remove(transaction)
         else:
             return False
 

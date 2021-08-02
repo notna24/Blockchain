@@ -1,6 +1,6 @@
 from cryptography.hazmat.primitives import hashes
 
-
+import json
 
 ## this uses Proof of work method
 ## but I don't really like POW method

@@ -1,6 +1,6 @@
 from cryptography.hazmat.primitives import hashes
 
-from blockchain import Mempool
+from blockchain import MemPool
 
 
 
@@ -10,7 +10,7 @@ class Transation:
 		self.outputs = []
 		self.timestamp = 0
 		self.fee = fee
-		self.hash = self.calc_hash()
+		self.hash = b""
 
 	def get_json(self):
 		pass
