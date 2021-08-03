@@ -20,5 +20,9 @@ class Block:
 		pass
 
 
-	def calc_hash(self):
+	def get_dic(self):
 		pass
+
+
+	def add_transaction(self, transaction):
+		self.transactions.append(transaction, hash)
