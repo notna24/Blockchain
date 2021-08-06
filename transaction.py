@@ -1,24 +1,67 @@
 from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric import utils
 
-from blockchain import MemPool
+import json
 
 
-
-class Transation:
-	def __init__(self, fee=0):
-		self.inputs = []
-		self.outputs = []
-		self.timestamp = 0
+class Transaction:
+	def __init__(self, utxo, inputs=[], outputs=[], timestamp=0, fee=0):
+		self.inputs = inputs
+		self.outputs = outputs
+		self.timestamp = timestamp
+		self.utxo = utxo
 		self.fee = fee
 		self.hash = b""
 
+		self.siganture = b""
+
+	def get_dict(self):
+		return {
+			"inputs": self.inputs,
+			"outputs": self.outputs,
+			"timestamp": self.timestamp,
+			"fee": self.fee,
+		}
+
 	def get_json(self):
-		pass
+		return json.dumps(self.get_dict(), indent=4)
 
 	def calc_hash(self):
+		digest = hashes.Hash(hashes.SHA512())
+		digest.update(b"hello world")
+		return digest.finalize()
+
+	def sign(self, private_key):
+		#signs transaction hash
+		digest = self.calc_hash()
+		self.signature = private_key.sign(
+			digest,
+			padding.PSS(
+				mgf=padding.MGF1(hashes.SH512()),
+				salt_length=padding.PSS.MAX_LENGTH
+			),
+			#utils.Prehashed(hashes.SHA512()) #nto shure, if I should use prehashed
+			hashes.SHA512()
+		)
+
+	def verify():
 		pass
 
 
-def make_transaction():
-	pass
 
+#utxo = unspend transaction output
+#solves double spend problem
+
+
+class Coinbase():
+	def __init__(self, output, amount):
+		self.output = output
+		self.amount = amount
+
+
+if __name__ == "__main__":
+	t = Transaction(3, [1, 2, 3], [4, 5, 6])
+	print(t.get_dict())
+	print(t.get_json())
+	print(t.calc_hash())
