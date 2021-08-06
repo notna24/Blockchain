@@ -7,6 +7,7 @@ class Blockchain:
         self.difficulty = 0
     
     def add_block(self, block):
+        #blocks.append(block)
         pass
 
     def load_from_json(self, file):
