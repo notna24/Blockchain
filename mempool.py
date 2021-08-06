@@ -7,7 +7,7 @@ class MemPool:
         self.transactions = []
 
     def add_transaction(self, transaction):
-        return self.transactions.append((transaction))
+        return self.transactions.append(transaction)
 
     def rm_transaction(self, transaction):
         if transaction in self.transactions:
