@@ -1,3 +1,4 @@
+import cryptography
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import utils
@@ -38,15 +39,28 @@ class Transaction:
 		self.signature = private_key.sign(
 			digest,
 			padding.PSS(
-				mgf=padding.MGF1(hashes.SH512()),
+				mgf=padding.MGF1(hashes.SHA512()),
 				salt_length=padding.PSS.MAX_LENGTH
 			),
 			#utils.Prehashed(hashes.SHA512()) #nto shure, if I should use prehashed
 			hashes.SHA512()
 		)
 
-	def verify():
-		pass
+	def verify(self, public_key):
+		try:
+			public_key.verify(
+				self.signature,
+				self.calc_hash(),
+				padding.PSS(
+					mgf=padding.MGF1(hashes.SHA512()),
+					salt_length=padding.PSS.MAX_LENGTH
+				),
+				hashes.SHA512()
+			)
+		except cryptography.exceptions.InvalidSignature:
+			return False
+		else:
+			return True
 
 
 
@@ -59,9 +73,14 @@ class Coinbase():
 		self.output = output
 		self.amount = amount
 
+	def verify(self):
+		return True
+
 
 if __name__ == "__main__":
 	t = Transaction(3, [1, 2, 3], [4, 5, 6])
 	print(t.get_dict())
 	print(t.get_json())
 	print(t.calc_hash())
+	t.sign()
+	print(t.verify())
