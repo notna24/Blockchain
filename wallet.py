@@ -3,16 +3,25 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 from mempool import MemPool
+from transaction import Transaction
 
 import os
+import time
 
 class Wallet:
     def __init__(self):
         self.keys= []
+        self.balance = 0
 
 
-    def make_transaction(self):
-        pass
+    def make_transaction(self, inputs, outputs, fee): 
+        #for testing purposes it just uses one input
+        transaction = Transaction(
+            inputs,
+            outputs,
+            fee=fee
+        )
+
 
 
     def store_in_file(self):
@@ -40,10 +49,11 @@ def gen_private_key():
 
 
 def serealize_public_key(public_key, password=None):
-    public_key.private_bytes(
+    pem = public_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo
     )
+    return pem
 
 
 def serealize_private_key(private_key, password=None):
@@ -52,3 +62,4 @@ def serealize_private_key(private_key, password=None):
         format=serialization.PrivateFormat.PKCSB,
         encryption_algorithm=serialization.BestAvailableEncryption(password) if password != None else serialization.NoEncryption()
     )
+    return pem
