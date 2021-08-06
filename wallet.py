@@ -16,12 +16,14 @@ class Wallet:
 
     def make_transaction(self, inputs, outputs, fee): 
         #for testing purposes it just uses one input
-        transaction = Transaction(
-            inputs,
-            outputs,
-            fee=fee
-        )
+        priv_key, pub_key = gen_key_pair()
 
+        _, pub_key1 = gen_key_pair()
+
+        transaction = Transaction(2)
+        transaction.sign(priv_key)
+        print(transaction.verify(pub_key))
+        print(transaction.verify(pub_key1))
 
 
     def store_in_file(self):
@@ -37,7 +39,12 @@ class Wallet:
 
 def gen_key_pair():
     private_key = gen_private_key()
-    return (private_key, private_key.public_key())
+    return private_key, private_key.public_key()
+
+
+def gen_serialized_key_pair(password):
+    priv_key, pub_key = gen_key_pair()
+    return serealize_private_key(priv_key, password), serealize_public_key(pub_key[1])
 
 
 def gen_private_key():
@@ -48,8 +55,8 @@ def gen_private_key():
 
 
 
-def serealize_public_key(public_key, password=None):
-    pem = public_key.private_bytes(
+def serealize_public_key(public_key):
+    pem = public_key.public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo
     )
@@ -59,7 +66,26 @@ def serealize_public_key(public_key, password=None):
 def serealize_private_key(private_key, password=None):
     pem = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.PKCSB,
+        format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.BestAvailableEncryption(password) if password != None else serialization.NoEncryption()
     )
     return pem
+
+
+def load_private_key(pem, password=None):
+    return serialization.load_pem_private_key(
+        pem,
+        password=password
+    )
+
+
+def load_public_pem_key(pem):
+    return serialization.load_pem_public_key(
+        pem,
+        password=None
+    )
+
+
+if __name__ == "__main__":
+    wallet = Wallet()
+    wallet.make_transaction(1, 3, 4)
