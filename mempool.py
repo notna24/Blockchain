@@ -13,7 +13,7 @@ class MemPool:
         if transaction.verify():
             return self.transactions.append(transaction)
         else:
-            return false
+            return False
 
     def rm_transaction(self, transaction):
         assert isinstance(transaction, Transaction)
