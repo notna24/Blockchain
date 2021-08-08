@@ -47,6 +47,7 @@ class Transaction:
 		)
 
 	def verify(self, public_key):
+		public_key = self.inputs
 		try:
 			public_key.verify(
 				self.signature,

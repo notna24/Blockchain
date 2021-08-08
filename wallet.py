@@ -13,7 +13,6 @@ class Wallet:
         self.keys= []
         self.balance = 0
 
-
     def make_transaction(self, inputs, outputs, fee): 
         #for testing purposes it just uses one input
         priv_key, pub_key = gen_key_pair()
@@ -25,10 +24,8 @@ class Wallet:
         print(transaction.verify(pub_key))
         print(transaction.verify(pub_key1))
 
-
     def store_in_file(self):
         pass
-
 
     def load_from_file(self, file_name):
         pass
