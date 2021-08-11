@@ -7,11 +7,13 @@ import json
 
 
 class Transaction:
-	def __init__(self, utxo, inputs=[], outputs=[], timestamp=0, fee=0):
+	def __init__(self, utxos, inputs=[], outputs=[], ex_addr=None, amounts=[], timestamp=0, fee=0):
 		self.inputs = inputs
 		self.outputs = outputs
+		self.ex_addr = ex_addr if ex_addr != None else self.inputs[len(self.inputs) - 1]
+		self.amounts = amounts
 		self.timestamp = timestamp
-		self.utxo = utxo
+		self.utxos = utxos
 		self.fee = fee
 		self.hash = b""
 
@@ -67,6 +69,19 @@ class Transaction:
 
 #utxo = unspend transaction output
 #solves double spend problem
+
+class Utxo():
+	def __init__(self, transaction_hash, public_key, amount):
+		self.transaction_hash = transaction_hash #the hash of the transaction, where the money was send to the adress. Not the adress of the transaction the utxo is used for
+		self.pub_key = public_key
+		self.amount = amount
+
+	def get_dict(self):
+		return {
+			"hash": self.hash,
+			"pub_key": self.pub_key,
+			"amount": self.amount
+		}
 
 
 class Coinbase():
