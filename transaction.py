@@ -3,6 +3,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import utils
 
+from blockchain import Blockchain
+
 import json
 
 
@@ -16,15 +18,38 @@ class Transaction:
 		self.utxos = utxos
 		self.fee = fee
 		self.hash = b""
-
 		self.siganture = b""
+
+		self.add_ex_addr()
+
+	def add_ex_addr(self):
+		utxo_value = 0
+		for utxo in self.utxo:
+			utxo_value += utxo.amount
+		self.outputs.append(self.ex_addr)
+		if utxo_value < self.amounts:
+			raise("utxo value is smaller than transaction volume")
+		self.amounts.append(utxo_value - self.amounts)
+
+	def check_all(self):
+		#checks if everything is correct :D
+		for input in self.inputs: # maybe change var name "input" to "pub_key"
+			if not self.verify(input):
+				return False
+		for utxo in self.utxos:
+			if not Blockchain.check_utxo(utxo):
+				return False
+		return True
+			
 
 	def get_dict(self):
 		return {
 			"inputs": self.inputs,
 			"outputs": self.outputs,
-			"timestamp": self.timestamp,
+			"amounts": self.amounts,
+			"utxos": self.utxos,
 			"fee": self.fee,
+			"signature": self.signature
 		}
 
 	def get_json(self):
@@ -78,19 +103,41 @@ class Utxo():
 
 	def get_dict(self):
 		return {
-			"hash": self.hash,
+			"transaction_hash": self.transaction_hash,
 			"pub_key": self.pub_key,
 			"amount": self.amount
 		}
 
+	def get_json(self):
+		return json.dumps(self.get_dict())
 
-class Coinbase():
+
+class CoinbaseTransaction():
 	def __init__(self, output, amount):
 		self.output = output
 		self.amount = amount
+		self.hash = self.calc_hash()
 
 	def verify(self):
 		return True
+
+	def check_all(self):
+		return True
+
+	def get_dict(self):
+		return {
+			"output": self.output,
+			"amount": self.amount,
+			"hash": self.hash
+		}
+
+	def get_json(self):
+		return json.dumps(self.get_dict())
+
+	def calc_hash(self):
+		digest = hashes.Hash(hashes.SHA512())
+		return digest
+		
 
 
 if __name__ == "__main__":
