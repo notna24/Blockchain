@@ -2,6 +2,8 @@ from cryptography.hazmat.primitives import hashes
 
 import json
 
+from transaction import Transaction
+
 ## this uses Proof of work method
 ## but I don't really like POW method
 
@@ -15,14 +17,22 @@ class Block:
 		self.difficulty = 0
 		self.hash = b""
 
+	def get_dict(self):
+		return {
+			"pv_hash": self.pv_hash,
+			"transactions": self.transactions,
+			"nonce": self.nonce,
+			"difficulty": self.difficulty,
+			"hash": self.hash
+		}
 
 	def get_json(self):
+		return json.dumps(self.get_dict())
+
+	def calc_hash(self):
+		# miner should not use this function
 		pass
-
-
-	def get_dic(self):
-		pass
-
 
 	def add_transaction(self, transaction):
-		self.transactions.append(transaction, hash)
+		assert isinstance(transaction, Transaction)
+		self.transactions.append(transaction)
