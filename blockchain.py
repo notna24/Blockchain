@@ -2,16 +2,35 @@ import json
 
 from transaction import Utxo
 from block import Block
-
+from transaction import CoinbaseTransaction
 
 class Blockchain:
     def __init__(self):
         self.blocks = []
         self.difficulty = 0
+
+    def check_block(self, block):
+        if block.calc_hash() == block.hash:
+            return block
+
+        #check if just one coinbase transaction exists in block
+        cb_counter = 0
+        #check if all transactinos of the block are valid
+        for transaction in block.transactions:
+            if not transaction.check_all():
+                return False
+            if isinstance(transaction, CoinbaseTransaction):
+                cb_counter += 1
+        if cb_counter != 1:
+            return False
+        return True
     
     def add_block(self, block):
         assert isinstance(block, Block)
-        pass
+        if self.check_block():
+            self.blocks.append(block)
+            return True
+        return False
 
     def check_utxo(self, utxo):
         status = False
@@ -20,8 +39,7 @@ class Blockchain:
                 for transaction_utxo in transaction.utxos:
                     # checks if utxo is already spend
                     if utxo.transaction_hash == transaction_utxo.transaction_hash:
-                        status = False
-                        break
+                        return False
                 if utxo.transaction_hash == transaction.hash and status != True:
                     for pub_key in transaction.inputs:
                         if utxo.pub_key == pub_key:
