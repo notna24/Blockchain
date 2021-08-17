@@ -1,5 +1,4 @@
 from transaction import Transaction
-
 import json
 
 
@@ -24,7 +23,7 @@ class MemPool:
 
     def get_dict(self):
         return {
-                "transactions": self.transactions
+                "transactions": self.transactions.get_dict()
         }
 
     def get_json(self):
@@ -33,6 +32,11 @@ class MemPool:
     def save_to_file(self, file_name="mempool.json"):
         with open(file_name, "w") as file:
             file.write(self.get_json())
+
+    def load_from_file(self, file_name="mempool.json"):
+        with open(file_name, "r") as file:
+            data = file.read()
+        json_ob = json.loads(data)
 
 
 if __name__ == "__main__":

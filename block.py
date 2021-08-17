@@ -31,7 +31,13 @@ class Block:
 
 	def calc_hash(self):
 		# miner should not use this function
-		pass
+		digest = hashes.Hash(hashes.SHA512())
+		composed = self.pv_hash
+		for transaction in self.transactions:
+			composed += transaction.calc_hash()
+		composed += bytes(self.nonce)
+		digest.update(composed)
+		return digest.finalize()
 
 	def add_transaction(self, transaction):
 		assert isinstance(transaction, Transaction)

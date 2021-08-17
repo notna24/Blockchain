@@ -3,7 +3,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import utils
 
-from blockchain import Blockchain
+from main import BLOCKCHAIN
 
 import json
 
@@ -18,7 +18,7 @@ class Transaction:
 		self.utxos = utxos
 		self.fee = fee
 		self.hash = b""
-		self.siganture = b""
+		self.sigantures = []
 
 		self.add_ex_addr()
 
@@ -37,7 +37,7 @@ class Transaction:
 			if not self.verify(input):
 				return False
 		for utxo in self.utxos:
-			if not Blockchain.check_utxo(utxo):
+			if not BLOCKCHAIN.check_utxo(utxo):
 				return False
 		return True
 			
@@ -56,9 +56,25 @@ class Transaction:
 		return json.dumps(self.get_dict(), indent=4)
 
 	def calc_hash(self):
-		digest = hashes.Hash(hashes.SHA512())
+		"""digest = hashes.Hash(hashes.SHA512())
 		digest.update(b"hello world")
+		return digest.finalize()"""
+		digest = hashes.Hash(hashes.SHA512())
+		composed = b""
+		for input in self.inputs:
+			composed += input
+		for output in self.outputs:
+			composed += output
+		for amount in self.amounts:
+			composed += bytes(amount)
+		for utxo in self.utxos:
+			composed += utxo.calc_hash()
+		composed += bytes(self.fee)
+		for signature in self.signatures:
+			composed += signature
+		digest.update(composed)
 		return digest.finalize()
+
 
 	def sign(self, private_key):
 		#signs transaction hash
@@ -101,6 +117,12 @@ class Utxo():
 		self.pub_key = public_key
 		self.amount = amount
 
+	def calc_hash(self):
+		digest = hashes.Hash(hashes.SHA512())
+		composed = self.transaction_hash + self.pub_key + bytes(self.amount)
+		digest.update(composed)
+		return digest.finalize()
+
 	def get_dict(self):
 		return {
 			"transaction_hash": self.transaction_hash,
@@ -136,12 +158,14 @@ class CoinbaseTransaction():
 
 	def calc_hash(self):
 		digest = hashes.Hash(hashes.SHA512())
-		return digest
+		composed = self.output + bytes(self.amount)
+		digest.update(composed)
+		return digest.finalize()
 		
 
 
 if __name__ == "__main__":
-	t = Transaction(3, [1, 2, 3], [4, 5, 6])
+	t = Transaction(3, [1, 2, 3], [4, 5, 6]) # not the right data types
 	print(t.get_dict())
 	print(t.get_json())
 	print(t.calc_hash())

@@ -2,7 +2,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from mempool import MemPool
+from main import MEMPOOL
 from transaction import Transaction
 
 import os
@@ -12,6 +12,9 @@ class Wallet:
     def __init__(self):
         self.keys= []
         self.balance = 0
+
+    def make_auto_transaction(self):
+        return
 
     def make_transaction(self, inputs, outputs, fee): 
         #for testing purposes it just uses one input
@@ -51,6 +54,9 @@ def gen_private_key():
         )
 
 
+def gen_sec_password():
+    return os.urandom(64)
+
 
 def serealize_public_key(public_key):
     pem = public_key.public_bytes(
@@ -84,5 +90,4 @@ def load_public_pem_key(pem):
 
 
 if __name__ == "__main__":
-    wallet = Wallet()
-    wallet.make_transaction(1, 3, 4)
+    print(gen_sec_password())
