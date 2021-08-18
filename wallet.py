@@ -2,36 +2,51 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from main import MEMPOOL
+from main import MEMPOOL, BLOCKCHAIN
 from transaction import Transaction
 
 import os
 import time
+import json
+
 
 class Wallet:
     def __init__(self):
-        self.keys= []
-        self.balance = 0
+        self.keys= [] # will contain key pairs as lists
+
+    def list_keys(self):
+        for key_pair in self.keys:
+            print(key_pair[0])
 
     def make_auto_transaction(self):
         return
 
-    def make_transaction(self, inputs, outputs, fee): 
-        #for testing purposes it just uses one input
-        priv_key, pub_key = gen_key_pair()
+    def make_transaction(self, utxos, inputs, priv_keys,  outputs, amounts, fee): 
 
-        _, pub_key1 = gen_key_pair()
+        transaction = Transaction(utxos, inputs, outputs, amounts, fee)
+        for pub_key, priv_key in zip(inputs, priv_keys):
+            transaction.sign(pub_key, priv_key)
 
-        transaction = Transaction(2)
-        transaction.sign(priv_key)
-        print(transaction.verify(pub_key))
-        print(transaction.verify(pub_key1))
+        r = MEMPOOL.add_transaction(transaction)
+        if not r:
+            print("transaction could not be added to mempool!")
+        else:
+            print("transaction made successfully")
 
-    def store_in_file(self):
-        pass
+    def get_dict(self):
+        return {"keys": self.keys}
 
-    def load_from_file(self, file_name):
-        pass
+    def get_json(self):
+        return json.dumps(self.get_dict())
+
+    def store_in_file(self, file_name="wallet.json"):
+        with open(file_name, "w") as file:
+            file.write(self.get_json())
+
+    def load_from_file(self, file_name="wallet.json"):
+        with open(file_name, "r") as file:
+            content = file.read()
+        self.keys = json.loads(content)["keys"]
 
 
 
@@ -87,6 +102,12 @@ def load_public_pem_key(pem):
         pem,
         password=None
     )
+"""
+def laod_key_from_file(file_name="wallet.json"):
+    with oepn(file_name, "r") as file:
+        content = file.read()
+    return json.loads(data)
+    """
 
 
 if __name__ == "__main__":
