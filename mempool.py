@@ -37,6 +37,7 @@ class MemPool:
         with open(file_name, "r") as file:
             data = file.read()
         json_ob = json.loads(data)
+        self.transactions = json_ob["transactions"]
 
 
 if __name__ == "__main__":
