@@ -12,20 +12,44 @@ import json
 
 class Wallet:
     def __init__(self):
-        self.keys= [] # will contain key pairs as lists
+        self.keys = [] # will contain key pairs as lists
+        self.key_dict = {}
 
     def list_keys(self):
         for key_pair in self.keys:
             print(key_pair[0])
 
-    def make_auto_transaction(self):
-        return
+    def find_standard_fee(self):
+        return 0.1
 
-    def make_transaction(self, utxos, inputs, priv_keys,  outputs, amounts, fee): 
+    def make_auto_transaction(self, outputs, amounts):
+        amount = 0
+        inputs = []
+        utxos = []
+        for key_pair in self.keys:
+            for utxo in BLOCKCHAIN.get_utxos(key_pair[0]):
+                amount += utxo.amount
+                inputs.append(key_pair[0])
+                utxos.append(utxos)
+                if amount >= sum(amounts):
+                    self.make_transaction(utxos, inputs, outputs, amounts, self.find_standard_fee())
+                    return 
+
+    def make_transaction(self, utxos, inputs, outputs, amounts, fee): 
+        #needs to find utxo and private keys
+
+        #finding private_keys
+        priv_keys = [self.dict[i] for i in self.inputs]
 
         transaction = Transaction(utxos, inputs, outputs, amounts, fee)
+
+        password = input("please input password: ")
+
         for pub_key, priv_key in zip(inputs, priv_keys):
+            priv_key = load_private_key(priv_key, password)
             transaction.sign(pub_key, priv_key)
+        
+        password = 0
 
         r = MEMPOOL.add_transaction(transaction)
         if not r:
@@ -47,6 +71,8 @@ class Wallet:
         with open(file_name, "r") as file:
             content = file.read()
         self.keys = json.loads(content)["keys"]
+        for key_pair in self.keys:
+            self.key_dict[key_pair[0]] = key_pair[1]
 
 
 
