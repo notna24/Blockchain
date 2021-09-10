@@ -3,7 +3,6 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import utils
 
-from main import BLOCKCHAIN
 
 import json
 
@@ -31,13 +30,13 @@ class Transaction:
 			raise("utxo value is smaller than transaction volume")
 		self.amounts.append(utxo_value - self.amounts)
 
-	def check_all(self):
+	def check_all(self, blockchain):
 		#checks if everything is correct :D
 		for input in self.inputs: # maybe change var name "input" to "pub_key"
 			if not self.verify(input):
 				return False
 		for utxo in self.utxos:
-			if not BLOCKCHAIN.check_utxo(utxo):
+			if not blockchain.check_utxo(utxo):
 				return False
 		return True
 			
