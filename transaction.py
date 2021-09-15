@@ -137,7 +137,7 @@ class CoinbaseTransaction():
 	def __init__(self, output, amount):
 		self.output = output
 		self.amount = amount
-		self.hash = self.calc_hash()
+		self.hash = lambda: self.calc_hash()
 
 	def verify(self):
 		return True
