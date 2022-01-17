@@ -2,12 +2,16 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from main import MEMPOOL, BLOCKCHAIN
+#from main import MEMPOOL, BLOCKCHAIN
 from transaction import Transaction
 
 import os
 import time
 import json
+
+
+BLOCKCHAIN = False
+MEMPOOL = False
 
 
 class Wallet:
@@ -85,7 +89,7 @@ def gen_key_pair():
 
 def gen_serialized_key_pair(password):
     priv_key, pub_key = gen_key_pair()
-    return serealize_private_key(priv_key, password), serealize_public_key(pub_key[1])
+    return serealize_private_key(priv_key, password), serealize_public_key(pub_key)
 
 
 def gen_private_key():
@@ -128,6 +132,13 @@ def load_public_pem_key(pem):
         pem,
         password=None
     )
+
+def store_key_pair(key_pair, filen="key.json"):
+    key_dict = {"private_key" : key_pair[0].decode("utf-8"), "public_key" : key_pair[1].decode("utf-8")}
+    json_ob = json.dumps(key_dict)
+    with open(filen, "w") as file:
+        file.write(json_ob)
+
 """
 def laod_key_from_file(file_name="wallet.json"):
     with oepn(file_name, "r") as file:
@@ -138,3 +149,7 @@ def laod_key_from_file(file_name="wallet.json"):
 
 if __name__ == "__main__":
     print(gen_sec_password())
+    key_pair = gen_serialized_key_pair(None)
+    print(str(key_pair[0]))
+    print(str(key_pair[1]))
+    store_key_pair(key_pair)
