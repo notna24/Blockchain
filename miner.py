@@ -1,8 +1,52 @@
 from cryptography.hazmat.primitives import hashes
 
 
-from main import BLOCKCHAIN, MEMPOOL
-from block import Block
+#from main import BLOCKCHAIN, MEMPOOL
+from block import Block, Header
 
-def calc_block(block):
-    pass
+
+BLOCKSIZE = 4
+
+BLOCKCHAIN = False
+MEMPOOL = False
+
+class Miner:
+    def __init__(self):
+        self.active : bool = True
+        self.pub_key = b""
+
+    def mine(self):
+        while self.active:
+            self.calc_block
+
+    def start(self):
+        if self.pub_key == b"":
+            print("could not start miner, because no public key was specified!")
+            return
+        print("started miner")
+        self.active = True
+
+    def stop(self):
+        print("stoped miner")
+        self.active = False
+
+
+    def get_transactions(self):
+        # gets a number of transactions specified by BLOCKSIZE
+        transactions = MEMPOOL.transactions.sort(key = lambda x: x.fee)
+        return transactions[-BLOCKSIZE:]
+
+    def calc_block(self):
+        while self.active:
+            block = Block()
+            block.pv_hash = BLOCKCHAIN.blocks[-1:].calc_hash()
+            block.transactions = self.get_transactions
+            block.difficulty = 2 # static value, since this is just a poc
+            block_hash = b""
+            nonce = 0
+            while block_hash[block.difficulty:] != b"0" * block.difficulty and self.active:
+                block.nonce = nonce
+                block_hash = block.calc_hash()
+            print("block found!")
+            ret = BLOCKCHAIN.add_block(block)
+            if not ret: raise(Exception("block was not valid!"))
