@@ -23,17 +23,17 @@ class Transaction:
 
 	def add_ex_addr(self):
 		utxo_value = 0
-		for utxo in self.utxo:
+		for utxo in self.utxos:
 			utxo_value += utxo.amount
 		self.outputs.append(self.ex_addr)
-		if utxo_value < self.amounts:
+		if utxo_value < sum(self.amounts):
 			raise("utxo value is smaller than transaction volume")
-		self.amounts.append(utxo_value - self.amounts)
+		self.amounts.append(utxo_value - sum(self.amounts))
 
 	def check_all(self, blockchain):
 		#checks if everything is correct :D
-		for input in self.inputs: # maybe change var name "input" to "pub_key"
-			if not self.verify(input):
+		for inp in self.inputs: # maybe change var name "input" to "pub_key"
+			if not self.verify(inp):
 				return False
 		for utxo in self.utxos:
 			if not blockchain.check_utxo(utxo):
@@ -60,8 +60,8 @@ class Transaction:
 		return digest.finalize()"""
 		digest = hashes.Hash(hashes.SHA512())
 		composed = b""
-		for input in self.inputs:
-			composed += input
+		for inp in self.inputs:
+			composed += inp
 		for output in self.outputs:
 			composed += output
 		for amount in self.amounts:
@@ -69,14 +69,14 @@ class Transaction:
 		for utxo in self.utxos:
 			composed += utxo.calc_hash()
 		composed += bytes(self.fee)
-		for signature in self.signatures:
-			composed += signature
+		#for signature in self.signatures: # should not be included in hash, since the hash is beeing signed
+		#	composed += signature
 		digest.update(composed)
 		return digest.finalize()
 
 
 	def sign(self, private_key):
-		#signs transaction hash
+		#signs transaction hash # maybe self.signature should be a list of signatures, because there are multiple inputs
 		digest = self.calc_hash()
 		self.signature = private_key.sign(
 			digest,
@@ -136,8 +136,12 @@ class Utxo():
 class CoinbaseTransaction():
 	def __init__(self, output, amount):
 		self.output = output
+		self.outputs = [self.output]
 		self.amount = amount
+		self.amounts = [self.amount]
 		self.hash = lambda: self.calc_hash()
+		self.utxos = [] # should always be empty
+		
 
 	def verify(self):
 		return True

@@ -71,4 +71,9 @@ class Block:
 		self.transactions.append(transaction)
 
 ORIGIN_BLOCK = Block()
-ORIGIN_BLOCK.add_transaction(CoinbaseTransaction(b"", 25))
+
+with open("keys/origin_key.json", "r") as key_file:
+    json_keys = key_file.read()
+okj = json.loads(json_keys)
+
+ORIGIN_BLOCK.add_transaction(CoinbaseTransaction(okj.get("public_key").encode("utf-8"), 25))

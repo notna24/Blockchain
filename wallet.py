@@ -16,8 +16,14 @@ MEMPOOL = False
 
 class Wallet:
     def __init__(self):
+        # self.keys contains private keys in serialized and public key in unserialized form.
         self.keys = [] # will contain key pairs as lists
         self.key_dict = {}
+        
+    def gen_keys(self, passwd=None):
+        priv, pub = gen_serialized_key_pair(passwd)
+        self.keys.append((priv, load_public_pem_key(pub)))
+        
 
     def list_keys(self):
         for key_pair in self.keys:
@@ -34,24 +40,27 @@ class Wallet:
             for utxo in BLOCKCHAIN.get_utxos(key_pair[0]):
                 amount += utxo.amount
                 inputs.append(key_pair[0])
-                utxos.append(utxos)
+                utxos.append(utxo)
                 if amount >= sum(amounts):
                     self.make_transaction(utxos, inputs, outputs, amounts, self.find_standard_fee())
                     return 
+        print("could not make transaction, bacause your balance was not high enough")
 
     def make_transaction(self, utxos, inputs, outputs, amounts, fee): 
         #needs to find utxo and private keys
 
         #finding private_keys
-        priv_keys = [self.dict[i] for i in self.inputs]
+        priv_keys = [self.key_dict[i] for i in inputs]
 
-        transaction = Transaction(utxos, inputs, outputs, amounts, fee)
+        transaction = Transaction(utxos=utxos, inputs=inputs, outputs=outputs, amounts=amounts, fee=fee)
 
-        password = input("please input password: ")
+		# password must be bytes like
+        password = input("please input password: ").encode("utf-8")
+        password = password if password != b"" else None
 
         for pub_key, priv_key in zip(inputs, priv_keys):
             priv_key = load_private_key(priv_key, password)
-            transaction.sign(pub_key, priv_key)
+            transaction.sign(priv_key)
         
         password = 0
 
@@ -120,17 +129,17 @@ def serealize_private_key(private_key, password=None):
     return pem
 
 
-def load_private_key(pem, password=None):
+def load_private_key(pem : bytes, password=None):
     return serialization.load_pem_private_key(
         pem,
         password=password
     )
 
 
-def load_public_pem_key(pem):
+def load_public_pem_key(pem : bytes):
     return serialization.load_pem_public_key(
-        pem,
-        password=None
+        pem
+        #password=None
     )
 
 def store_key_pair(key_pair, filen="key.json"):

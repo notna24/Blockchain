@@ -23,7 +23,7 @@ class MemPool:
 
     def get_dict(self):
         return {
-                "transactions": self.transactions.get_dict()
+                "transactions": self.transactions#.get_dict()
         }
 
     def get_json(self):
