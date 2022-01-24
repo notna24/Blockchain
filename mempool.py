@@ -9,7 +9,7 @@ class MemPool:
 
     def add_transaction(self, transaction):
         assert isinstance(transaction, Transaction)
-        if transaction.verify():
+        if transaction.verify():#transaction.inputs[0]):
             return self.transactions.append(transaction)
         else:
             return False

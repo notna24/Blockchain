@@ -42,3 +42,9 @@ if __name__ == "__main__":
 	bb = BC.blocks
 	print(MP.get_dict())
 	print(wallet.MEMPOOL.get_dict())
+	
+	MI.start()
+	
+	W1.make_auto_transaction(W2.keys[0][0], [1])
+	
+	

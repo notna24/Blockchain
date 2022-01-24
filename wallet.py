@@ -44,7 +44,10 @@ class Wallet:
                 if amount >= sum(amounts):
                     self.make_transaction(utxos, inputs, outputs, amounts, self.find_standard_fee())
                     return 
-        print("could not make transaction, bacause your balance was not high enough")
+        print(amount)
+        print(sum(amounts))
+        print(len(utxos))
+        print("could not make transaction, because your balance was not high enough")
 
     def make_transaction(self, utxos, inputs, outputs, amounts, fee): 
         #needs to find utxo and private keys
@@ -65,7 +68,7 @@ class Wallet:
         password = 0
 
         r = MEMPOOL.add_transaction(transaction)
-        if not r:
+        if r == False:
             print("transaction could not be added to mempool!")
         else:
             print("transaction made successfully")

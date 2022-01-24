@@ -42,7 +42,8 @@ class Blockchain:
                     # checks if utxo is already spend
                     if utxo.transaction_hash == transaction_utxo.transaction_hash:
                         return False
-                if utxo.transaction_hash == transaction.hash and status != True:
+                print(utxo.transaction_hash, transaction.calc_hash())
+                if utxo.transaction_hash == transaction.calc_hash() and status != True:
                     for pub_key in transaction.outputs: # changed transaction.inputs to transaction.outputs
                         if utxo.pub_key == pub_key:
                             status = True
@@ -54,11 +55,8 @@ class Blockchain:
         for block in self.blocks:
             for transaction in block.transactions:
                 for i, output in enumerate(transaction.outputs):
-                    print(output)
-                    print(pub_key)
                     if output == pub_key:
-                        utxo = Utxo(transaction.hash, pub_key, transaction.amounts[i])
-                        print("-here-")
+                        utxo = Utxo(transaction.calc_hash(), pub_key, transaction.amounts[i])
                         if self.check_utxo(utxo):
                             utxos.append(utxo)
         return utxos

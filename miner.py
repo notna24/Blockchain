@@ -6,7 +6,7 @@ from block import Block, Header
 
 
 # number of transactions that should be in one block, excluding the coinbase tx
-BLOCKSIZE = 2
+BLOCKSIZE = 1
 
 BLOCKCHAIN = False
 MEMPOOL = False

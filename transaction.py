@@ -1,5 +1,6 @@
 import cryptography
 from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import utils
 
@@ -68,7 +69,7 @@ class Transaction:
 			composed += bytes(amount)
 		for utxo in self.utxos:
 			composed += utxo.calc_hash()
-		composed += bytes(self.fee)
+		composed += str(self.fee).encode("utf-8")
 		#for signature in self.signatures: # should not be included in hash, since the hash is beeing signed
 		#	composed += signature
 		digest.update(composed)
@@ -88,8 +89,9 @@ class Transaction:
 			hashes.SHA512()
 		)
 
-	def verify(self, public_key):
-		public_key = self.inputs
+	def verify(self):#, public_key):
+		public_pem = self.inputs[0] # quick fix. Needs to loop through all public keys!
+		public_key = serialization.load_pem_public_key(public_pem)
 		try:
 			public_key.verify(
 				self.signature,
@@ -118,6 +120,7 @@ class Utxo():
 
 	def calc_hash(self):
 		digest = hashes.Hash(hashes.SHA512())
+		print(self.transaction_hash, self.pub_key, bytes(self.amount))
 		composed = self.transaction_hash + self.pub_key + bytes(self.amount)
 		digest.update(composed)
 		return digest.finalize()
