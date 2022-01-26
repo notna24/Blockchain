@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
 	MP = mempool.MemPool()
 	BC = blockchain.Blockchain()
-	BC.difficulty = 3
+	BC.difficulty = 1
 
 	miner.BLOCKCHAIN = BC
 	miner.MEMPOOL = MP
@@ -29,22 +29,33 @@ if __name__ == "__main__":
 	#print(okj.get("public_key"))
 	#print(wallet.load_public_pem_key(okj.get("public_key").encode("utf-8")))
 	OW.keys.append((okj.get("public_key").encode("utf-8"), okj.get("private_key").encode("utf-8")))
-	OW.key_dict[okj.get("public_key").encode("utf-8")] =  okj.get("private_key").encode("utf-8")
+	#OW.key_dict[okj.get("public_key").encode("utf-8")] =  okj.get("private_key").encode("utf-8")
 
 	W1 = wallet.Wallet()
 	W1.gen_keys()
-    
+	
 	W2 = wallet.Wallet()
 	W2.gen_keys()
+	
+	#print(OW.key_dict)
 
 	OW.make_auto_transaction([W1.keys[0][0]], [2])
 	#print(OW.get_dict())
 	bb = BC.blocks
-	print(MP.get_dict())
-	print(wallet.MEMPOOL.get_dict())
+	#print(MP.get_dict())
+	#print(wallet.MEMPOOL.get_dict())
 	
+	MI.pub_key = W1.keys[0][0]
 	MI.start()
 	
-	W1.make_auto_transaction(W2.keys[0][0], [1])
+	MI.status = False
 	
+	while len(BC.blocks) == 1:
+		continue
+	W1.make_auto_transaction([W2.keys[0][0]], [1])
 	
+	#print("here")
+	
+	BC.save()
+	
+	print("end")

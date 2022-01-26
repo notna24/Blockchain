@@ -46,14 +46,23 @@ class Block:
 	def get_dict(self):
 		return {
 			"pv_hash": self.pv_hash,
-			"transactions": self.transactions,
+			"transactions": {f"transaction{i}": tx.get_dict() for i, tx in enumerate(self.transactions)},
 			"nonce": self.nonce,
 			"difficulty": self.difficulty,
 			"hash": self.hash
 		}
+	
+	def get_str_dict(self):
+		return {
+			"pv_hash": str(self.pv_hash),
+			"transactions": {f"transaction{i}": tx.get_str_dict() for i, tx in enumerate(self.transactions)},
+			"nonce": self.nonce,
+			"difficulty": self.difficulty,
+			"hash": str(self.hash)
+		}
 
 	def get_json(self):
-		return json.dumps(self.get_dict())
+		return json.dumps(self.get_str_dict())
 
 	def calc_hash(self):
 		# miner should not use this function
@@ -64,7 +73,7 @@ class Block:
 		composed += bytes(self.nonce)
 		digest.update(composed)
 		self.hash = digest.finalize()
-		return digest.finalize()
+		return self.hash
 
 	def add_transaction(self, transaction):
 		#assert isinstance(transaction, Transaction)
@@ -73,7 +82,7 @@ class Block:
 ORIGIN_BLOCK = Block()
 
 with open("keys/origin_key.json", "r") as key_file:
-    json_keys = key_file.read()
+	json_keys = key_file.read()
 okj = json.loads(json_keys)
 
 ORIGIN_BLOCK.add_transaction(CoinbaseTransaction(okj.get("public_key").encode("utf-8"), 25))

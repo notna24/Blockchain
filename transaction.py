@@ -34,7 +34,7 @@ class Transaction:
 	def check_all(self, blockchain):
 		#checks if everything is correct :D
 		for inp in self.inputs: # maybe change var name "input" to "pub_key"
-			if not self.verify(inp):
+			if not self.verify():
 				return False
 		for utxo in self.utxos:
 			if not blockchain.check_utxo(utxo):
@@ -47,13 +47,23 @@ class Transaction:
 			"inputs": self.inputs,
 			"outputs": self.outputs,
 			"amounts": self.amounts,
-			"utxos": self.utxos,
+			"utxos": {f"utxo{i}" : u.get_dict() for i, u in enumerate(self.utxos)},
 			"fee": self.fee,
 			"signature": self.signature
 		}
+	
+	def get_str_dict(self):
+		return {
+			"inputs": {f"input{i}": str(inp) for i, inp in enumerate(self.inputs)},
+			"outputs": {f"output{i}": str(out) for i, out in enumerate(self.outputs)},
+			"amounts": self.amounts,
+			"utxos": {f"utxo{i}": u.get_str_dict() for i, u in enumerate(self.utxos)},
+			"fee": self.fee,
+			"signature": str(self.signature)
+		}
 
 	def get_json(self):
-		return json.dumps(self.get_dict(), indent=4)
+		return json.dumps(self.get_str_dict(), indent=4)
 
 	def calc_hash(self):
 		"""digest = hashes.Hash(hashes.SHA512())
@@ -120,7 +130,7 @@ class Utxo():
 
 	def calc_hash(self):
 		digest = hashes.Hash(hashes.SHA512())
-		print(self.transaction_hash, self.pub_key, bytes(self.amount))
+		#print(self.transaction_hash, self.pub_key, bytes(self.amount))
 		composed = self.transaction_hash + self.pub_key + bytes(self.amount)
 		digest.update(composed)
 		return digest.finalize()
@@ -129,6 +139,13 @@ class Utxo():
 		return {
 			"transaction_hash": self.transaction_hash,
 			"pub_key": self.pub_key,
+			"amount": self.amount
+		}
+	
+	def get_str_dict(self):
+		return {
+			"transaction_hash": str(self.transaction_hash),
+			"pub_key": str(self.pub_key),
 			"amount": self.amount
 		}
 
@@ -149,7 +166,7 @@ class CoinbaseTransaction():
 	def verify(self):
 		return True
 
-	def check_all(self):
+	def check_all(self, blockchain): # blockchain is only specified to be compatible. It has no practical usage
 		return True
 
 	def get_dict(self):
@@ -157,6 +174,13 @@ class CoinbaseTransaction():
 			"output": self.output,
 			"amount": self.amount,
 			"hash": self.hash
+		}
+	
+	def get_str_dict(self):
+		return {
+			"output": str(self.output),
+			"amount": self.amount,
+			"hash": str(self.hash)
 		}
 
 	def get_json(self):
