@@ -180,7 +180,7 @@ class CoinbaseTransaction():
 		return {
 			"output": str(self.output),
 			"amount": self.amount,
-			"hash": str(self.hash)
+			"hash": str(self.calc_hash())
 		}
 
 	def get_json(self):
