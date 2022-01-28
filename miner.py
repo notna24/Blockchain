@@ -65,7 +65,7 @@ class Miner(threading.Thread):
 			block.difficulty = BLOCKCHAIN.difficulty
 			block_hash = b""
 			nonce = 0
-			print(block.transactions)
+			#print(block.transactions)
 			while block_hash[:block.difficulty] != b"\x00" * block.difficulty and self.active:
 				#print(block_hash[block.difficulty:], b"\x00" * block.difficulty)
 				#if block_hash[block.difficulty:] == b"\x00":
@@ -76,9 +76,11 @@ class Miner(threading.Thread):
 				#print(block.transactions)
 				#print(block_hash[0])
 				nonce += 1
-			print("block found!")
 			ret = BLOCKCHAIN.add_block(block)
-			if not ret: raise(Exception("block was not valid!"))
+			if not ret:
+				print("block was not valid!")
+				continue
+			print("block found!")
 			# this part needs to be made more secure
 			for tx in block.transactions:
 				MEMPOOL.rm_transaction(tx)
