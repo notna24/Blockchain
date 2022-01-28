@@ -58,4 +58,7 @@ if __name__ == "__main__":
 	
 	BC.save()
 	
+	MI.stop()
+	MI.join()
+	
 	print("end")
