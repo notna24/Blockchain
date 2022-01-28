@@ -18,11 +18,11 @@ class Blockchain:
 		#check if just one coinbase transaction exists in block
 		cb_counter = 0
 		#check if all transactinos of the block are valid
-		print(block.transactions)
+		#print(block.transactions)
 		for transaction in block.transactions:
 			if not transaction.check_all(self):
 				return False
-			print(transaction)
+			#print(transaction)
 			if isinstance(transaction, CoinbaseTransaction):
 				cb_counter += 1
 		if cb_counter != 1:
@@ -72,7 +72,6 @@ class Blockchain:
 		return {f'block_{i}': b.get_dict() for i, b in enumerate(self.blocks) }
 	
 	def get_str_dict(self):
-		print("\n", {f'block_{i}': b.get_str_dict() for i, b in enumerate(self.blocks) })
 		return {f'block_{i}': b.get_str_dict() for i, b in enumerate(self.blocks) }
 
 	def get_json(self):
