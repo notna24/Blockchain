@@ -1,6 +1,6 @@
 # Blockchain
 
-Thsi is a simple blockchain I wrote in python. Im currently still working on it, since it is not finished yet.
+This is a simple blockchain I wrote in python. Im currently still working on it, since it is not finished yet.
 
 # Running
 
